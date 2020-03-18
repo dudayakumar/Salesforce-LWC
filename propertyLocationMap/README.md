@@ -6,6 +6,6 @@ Google map should locate the address when viewing a record
 |:--:| 
 | *Google Map on lightning page layout* |
 
-| <img src="https://github.com/dudayakumar/Salesforce-LWC/blob/master/propertyLocationMap/Screenshots/map-details.png" alt="Google Map on lightning page layout" style="width: 400px;"/> |
+| <img src="https://github.com/dudayakumar/Salesforce-LWC/blob/master/propertyLocationMap/Screenshots/map-details.png" alt="Map details" style="width: 400px;"/> |
 |:--:| 
 | *Google Map on lightning page layout* |
