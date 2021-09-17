@@ -1,0 +1,38 @@
+<template>
+    <template if:true={displayLoginScreen}>
+        <div>
+            <div class="main-container slds-grid slds-grid_vertical loginForm">
+                <input type="text" data-id="inputUsername" placeholder="Username" class="slds-input input-element loginFormElement" onchange={handleUserNameChange} required />
+                <input type="password" data-id="inputPassword" placeholder="Password" class="slds-input input-element loginFormElement" onchange={handlePasswordChange} required/>
+                <button type="submit" class="login-button slds-button loginFormButton" onclick={verifyCreds}><span class="loginButtonText">Log In</span></button>
+            </div>
+
+            <div class="loginForgot">
+                <a href="">Forgot your password?</a>
+            </div>
+            <template if:false={correctCred}>
+                <div>{wrongCredMsg}</div>
+            </template>
+        </div>
+    </template>
+    
+    <template if:true={displayVerifMethodScreen}>
+        <div class="main-container slds-grid slds-grid_vertical loginForm">
+            <div class="verifyButtonStyle"><button type="button" onclick={verifyAuthApp} value="Verify via Auth App" class="login-button slds-button verifyFormButton"><span class="loginButtonText">Verify via Auth App</span></button></div>
+            <div class="verifyButtonStyle"><button type="button" onclick={verifyEmail} value="Verify via Email" class="login-button slds-button verifyFormButton"><span class="loginButtonText">Verify via Email</span></button></div>
+            <div class="verifyButtonStyle"><button type="button" onclick={verifySMS} value="Verify via SMS" class="login-button slds-button verifyFormButton"><span class="loginButtonText">Verify via SMS</span></button></div>
+        </div>
+    </template>
+
+    <template if:true={displayVerifCodeScreen}>
+        <div class="main-container slds-grid slds-grid_vertical loginForm">
+            <input type="number" data-id="" placeholder="Verification Code" class="slds-input input-element loginFormElement" onchange={handleVerifCodeChange} required />
+            <template if:true={displaySmsVerifButton}>
+                <button type="submit" onclick={verifySmsCode} class="login-button slds-button loginFormButton"><span class="loginButtonText">Log In</span></button>
+            </template>
+            <template if:true={displayEmailVerifButton}>
+                <button type="submit" onclick={verifyEmailCode} class="login-button slds-button loginFormButton"><span class="loginButtonText">Log In</span></button>
+            </template>
+        </div>
+    </template>
+</template>

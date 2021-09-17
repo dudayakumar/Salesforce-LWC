@@ -1,0 +1,47 @@
+.loginForm input {
+    margin-bottom: 10px;
+}
+
+.loginFormButton {
+    background-color: rgb(10, 46, 76);
+    color: rgb(255, 255, 255);
+    border-width: 3px;
+    border-color: rgb(10, 46, 76);
+    text-align: center;
+    padding: 8px;
+}
+
+.loginFormElement {
+    margin-bottom: 10px;
+    padding: 12px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+}
+
+.loginButtonText {
+    font-size: 16px;
+    font-weight: 700;
+    margin: auto;
+}
+
+.loginForgot {
+    color: rgb(10, 46, 76);
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.verifyFormButton {
+    background-color: rgb(10, 46, 76);
+    color: rgb(255, 255, 255);
+    border-width: 3px;
+    border-color: rgb(10, 46, 76);
+    text-align: center;
+    padding: 8px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.verifyButtonStyle {
+    width: 100%;
+}
