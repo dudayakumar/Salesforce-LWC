@@ -8,7 +8,7 @@
             </div>
 
             <div class="loginForgot">
-                <a href="">Forgot your password?</a>
+                <div onclick={forgotPassword}>Forgot your password?</div>
             </div>
             <template if:false={correctCred}>
                 <div>{wrongCredMsg}</div>

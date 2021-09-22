@@ -1,8 +1,12 @@
 import { LightningElement, track } from 'lwc';
 import doLogin from '@salesforce/apex/ContiSiteLoginController.doLogin';
+import initVerification from '@salesforce/apex/ContiSiteLoginController.initVerification';
+import forgotPassword from '@salesforce/apex/ContiSiteLoginController.forgotPassword';
 import sendVerifCodeViaTwilioSMS from '@salesforce/apex/ContiSiteLoginController.sendVerifCodeViaTwilioSMS';
 import verifyVerifCodeViaTwilioSMS from '@salesforce/apex/ContiSiteLoginController.verifyVerifCodeViaTwilioSMS';
 import sendVerifCodeViaEmail from '@salesforce/apex/ContiSiteLoginController.sendVerifCodeViaEmail';
+import addMfaPermisionSet from '@salesforce/apex/ContiSiteLoginController.addMfaPermisionSet';
+import removeMfaPermisionSet from '@salesforce/apex/ContiSiteLoginController.removeMfaPermisionSet';
 
 export default class ContiSiteLogin extends LightningElement {
     username;
@@ -87,11 +91,73 @@ export default class ContiSiteLogin extends LightningElement {
         }
     }
 
+    //sends password reset email to user
+    forgotPassword(){
+        console.log('forgotPassword username: '+this.username);
+
+        forgotPassword({uname: this.username})
+        .then((result) => {
+            console.log('forgotPassword result: '+JSON.stringify(result));
+        })
+        .catch((error) => {
+            this.error = error;      
+            this.errorCheck = true;
+            this.errorMessage = error.body.message;
+            console.log('forgotPassword error: '+JSON.stringify(this.error));
+        });
+    }
+
     //redirects to auth app verification if user chooses to verify via the SF Authenticator App
     verifyAuthApp(){
-
         console.log('authAppRedirectUrl: '+this.authAppRedirectUrl);
-        window.location.href = this.authAppRedirectUrl;
+        window.location.href = 'https://uat-conti.cs200.force.com/InvestorPortal/_ui/identity/verification/method/ToopherVerificationFinishUi/e';
+
+        // addMfaPermisionSet({uname: this.username})
+        // .then((result) => {
+        //     console.log('result verifyAuthApp addMfaPermisionSet: '+result);
+        //     if(result == true){
+
+        //         setInterval(function() {
+        //             window.location.href = this.authAppRedirectUrl;
+        //         }.bind(this), 5000);
+
+        //         setInterval(function() {
+        //             removeMfaPermisionSet({uname: this.username})
+        //             .then((result) => {
+
+        //                 console.log('result verifyAuthApp removeMfaPermisionSet: '+result);
+        //             })
+        //             .catch((error) => {
+        //                 this.error = error;      
+        //                 this.errorCheck = true;
+        //                 this.errorMessage = error.body.message;
+        //                 console.log('verifyAuthApp error: '+JSON.stringify(this.error));
+        //             });
+        //         }.bind(this), 10000);
+        //     }
+        // })
+        // .catch((error) => {
+        //     this.error = error;      
+        //     this.errorCheck = true;
+        //     this.errorMessage = error.body.message;
+        //     console.log('verifyAuthApp error: '+JSON.stringify(this.error));
+        // });
+
+        // initVerification()
+        // .then((result) => {
+        //     this.verifCode = result;
+        //     console.log('this.verifCode: '+JSON.stringify(this.verifCode));
+        //     this.displayLoginScreen = false;
+        //     this.displayVerifMethodScreen = false;
+        //     this.displayVerifCodeScreen = true;
+
+        // })
+        // .catch((error) => {
+        //     this.error = error;      
+        //     this.errorCheck = true;
+        //     this.errorMessage = error.body.message;
+        //     console.log('sendVerifCodeViaTwilioSMS error: '+JSON.stringify(this.error));
+        // });
     }
 
     //Sends verification code to user via Twilio SMS (for 2nd step of authentication)
@@ -126,7 +192,8 @@ export default class ContiSiteLogin extends LightningElement {
             this.verifStatus = result;
             console.log('this.verifStatus: '+JSON.stringify(this.verifStatus));
             //site redirect logic
-            window.location.href = 'https://uat-conti.cs200.force.com/InvestorPortal/s/';
+            window.location.href = this.authAppRedirectUrl;
+            //'https://uat-conti.cs200.force.com/InvestorPortal/s/';
         })
         .catch((error) => {
             this.error = error;      
@@ -163,7 +230,10 @@ export default class ContiSiteLogin extends LightningElement {
         if(this.verifCode == this.userVerifCode){
             console.log('email verification success');
             //site redirect logic
-            window.location.href = 'https://uat-conti.cs200.force.com/InvestorPortal/s/';
+            console.log('document cookie: '+document.cookie);
+            console.log('decoded cookie: '+decodeURIComponent(document.cookie));
+            window.location.href = this.authAppRedirectUrl;
+            //'https://uat-conti.cs200.force.com/InvestorPortal/s/';
         }
         else{
             console.log('email verification failure');

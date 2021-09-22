@@ -48,12 +48,12 @@ public class ContiSiteLoginController {
      * @param username String for username
      */
     @AuraEnabled
-    public static String forgotPassowrd(String username) {
+    public static String forgotPassword(String uname) {
         String procesMsg = '';
         
-        if (Site.isValidUsername(username)) {
+        if (Site.isValidUsername(uname)) {
 
-            Site.forgotPassword(username);
+            Site.forgotPassword(uname);
             procesMsg = 'Login reset success';
         }
         else {
@@ -208,13 +208,10 @@ public class ContiSiteLoginController {
     // @AuraEnabled
     // public static String initVerification() {
 
-    //     Id userId = UserInfo.getUserId();
-    //     User u = [SELECT Id FROM User WHERE Id=: userId LIMIT 1];
-    //     // user will receive code on their registered verified email 
-    //     String id = UserManagement.initRegisterVerificationMethod(Auth.VerificationMethod.EMAIL);
+    //     String id = UserManagement.initRegisterVerificationMethod(Auth.VerificationMethod.SALESFORCE_AUTHENTICATOR);
     //     System.debug('*****id: '+id);
 
-    //     String res = System.UserManagement.verifyRegisterVerificationMethod('123456', Auth.VerificationMethod.EMAIL);
+    //     String res = System.UserManagement.verifyRegisterVerificationMethod('123456', Auth.VerificationMethod.SALESFORCE_AUTHENTICATOR);
         
     //     System.debug('*****res: '+res);
 
@@ -225,19 +222,16 @@ public class ContiSiteLoginController {
     // public static Auth.VerificationResult verifyVerification(String identifier, String code) {
     //     // requiring identifier from the initVerification
     //     // the code will need to be entered in this method
-    //     return UserManagement.verifyVerificationMethod(identifier, code , Auth.VerificationMethod.EMAIL);
+    //     return UserManagement.verifyVerificationMethod(identifier, code , Auth.VerificationMethod.SALESFORCE_AUTHENTICATOR);
     // }
 
     // @AuraEnabled
     // public static Auth.VerificationResult initVerification() {
 
-    //     Id userId = UserInfo.getUserId();
-    //     User u = [SELECT Id FROM User WHERE Id=: userId LIMIT 1];
-    //     // user will receive code on their registered verified email 
-    //     String id = UserManagement.initSelfRegistration(Auth.VerificationMethod.EMAIL, u);
+    //     String id = UserManagement.initSelfRegistration(Auth.VerificationMethod.SMS, u);
     //     System.debug('*****id: '+id);
 
-    //     Auth.VerificationResult res = System.UserManagement.verifySelfRegistration(Auth.VerificationMethod.EMAIL, id, '123456', null);
+    //     Auth.VerificationResult res = System.UserManagement.verifySelfRegistration(Auth.VerificationMethod.SMS, id, '123456', null);
         
     //     System.debug('*****res: '+res);
     //     System.debug('*****res.success: '+res.success);
@@ -250,22 +244,61 @@ public class ContiSiteLoginController {
 
     // @AuraEnabled
     // public static Auth.VerificationResult initVerification() {
+    @AuraEnabled
+    public static String initVerification() {
 
-    //     Id userId = UserInfo.getUserId();
-    //     User u = [SELECT Id FROM User WHERE Id=: userId LIMIT 1];
-    //     // user will receive code on their registered verified email 
-    //     String id = UserManagement.initVerificationMethod(Auth.VerificationMethod.EMAIL);
-    //     System.debug('*****id: '+id);
+        PageReference p =  System.UserManagement.registerVerificationMethod(Auth.VerificationMethod.SALESFORCE_AUTHENTICATOR, 'https://uat-conti.cs200.force.com/InvestorPortal/s/');
 
-    //     Auth.VerificationResult res = System.UserManagement.verifyVerificationMethod(id, '123456', Auth.VerificationMethod.EMAIL);
+        String id = UserManagement.initVerificationMethod(Auth.VerificationMethod.SALESFORCE_AUTHENTICATOR);
+        System.debug('*****id: '+id);
+
+        return id;
+
+        // Auth.VerificationResult res = System.UserManagement.verifyVerificationMethod(id, '', Auth.VerificationMethod.SALESFORCE_AUTHENTICATOR);
         
-    //     System.debug('*****res: '+res);
-    //     System.debug('*****res.success: '+res.success);
-    //     if(res.success == true){
-    //             //redirect
-    //     }
+        // System.debug('*****res: '+res);
+        // System.debug('*****res.success: '+res.success);
+        // if(res.success == true){
+        //         //redirect
+        // }
 
-    //     return res;
-    // }
+        // return res;
+    }
+
+    @AuraEnabled
+    public static Boolean addMfaPermisionSet(String uname){
+        
+        Id userId = getSiteLoginUserDetails(uname).Id;
+        Id permSetId = [SELECT Id FROM PermissionSet WHERE Name = 'Enable_Multi_Factor_Authenication' LIMIT 1].Id;
+        Boolean psAssigned = false;
+
+        if(permSetId != null){
+            List<PermissionSetAssignment> permSetCheck = [
+                SELECT Id FROM PermissionSetAssignment WHERE PermissionSetId =: permSetId AND AssigneeId =: userId];
+
+            if(permSetCheck.size() == 0){
+                PermissionSetAssignment psa = new PermissionSetAssignment(PermissionSetId = permSetId, AssigneeId = userId);
+                insert psa;
+                psAssigned = true;
+            }
+        }
+
+        return psAssigned;
+    }
+
+    @AuraEnabled
+    public static Boolean removeMfaPermisionSet(String uname){
+        
+        Id userId = getSiteLoginUserDetails(uname).Id;
+        Id permSetId = [SELECT Id FROM PermissionSet WHERE Name = 'Enable_Multi_Factor_Authenication' LIMIT 1].Id;
+        Boolean psRemoved = false;
+
+        if(permSetId != null){
+            delete [SELECT Id FROM PermissionSetAssignment WHERE PermissionSetId =: permSetId AND AssigneeId =: userId];
+            psRemoved = true;
+        }
+
+        return psRemoved;
+    }
 
 }
